@@ -1,4 +1,13 @@
 import { h, render } from 'preact';
+
+import 'material-design-icons/iconfont/material-icons.css';
+import 'material-design-icons/iconfont/MaterialIcons-Regular.ttf';
+import 'material-design-icons/iconfont/MaterialIcons-Regular.woff';
+import 'material-design-icons/iconfont/MaterialIcons-Regular.woff2';
+import 'material-design-lite';
+import 'material-design-lite/dist/material.indigo-pink.min.css';
+import './styles.css';
+
 import { App } from './app/App';
 
 const isProd = process.env.NODE_ENV === 'production';
