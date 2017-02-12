@@ -6,8 +6,7 @@ const HtmlWebpackPlugin = require( 'html-webpack-plugin' );
 const ProgressBarPlugin = require( 'progress-bar-webpack-plugin' );
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { CheckerPlugin } = require('awesome-typescript-loader');
-const cssnext = require( 'postcss-cssnext' );
-const postcssReporter = require( 'postcss-reporter' );
+
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 
@@ -35,6 +34,44 @@ module.exports = (env) => {
           include: /src/,
           use: [ 'awesome-typescript-loader' ]
         },
+        {
+          test: /\.css$/,
+          // include: /src/,
+          use: ifDev(
+            [
+              'style-loader',
+              {
+                loader: 'css-loader',
+                options: {
+                  importLoaders: 1
+                }
+              },
+              {
+                loader: 'postcss-loader',
+                options: {
+                  plugins: function () {
+                    return [
+                      require("postcss-import")({ addDependencyTo: webpack }),
+                      require("postcss-url")(),
+                      require("postcss-nested")(),
+                      require("postcss-cssnext")({browsers: [ 'last 2 versions', 'IE > 10' ]}),
+                      // add your "plugins" here
+                      // ...
+                      // and if you want to compress,
+                      // just use css-loader option that already use cssnano under the hood
+                      require("postcss-browser-reporter")(),
+                      require("postcss-reporter")(),
+                    ]
+                  }
+                }
+              }
+            ],
+            ExtractTextPlugin.extract({
+              fallback: 'style-loader',
+              use: 'css-loader',
+            })
+          )
+        },
         // Fonts Loading
         {
           test: /\.(woff(2)?|eot|ttf|svg)(\?[a-z0-9=.]+)?$/,
@@ -55,16 +92,6 @@ module.exports = (env) => {
         // Legacy loader plugin configs ( for plugins not yet ready for WebPack 2 Api )
         options: {
           context: __dirname,
-          postcss: {
-            plugins: [
-              // Allow future CSS features to be used, also auto-prefixes the CSS...
-              cssnext( {
-                // ...based on this browser list
-                browsers: [ 'last 2 versions', 'IE > 10' ],
-              } ),
-              postcssReporter()
-            ]
-          }
         }
       } ),
 
